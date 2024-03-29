@@ -5,19 +5,30 @@ find_flutter_path() {
     # Obtenemos los directorios listados en la variable de entorno PATH
     local -a path_directories=("${(@s/:/)PATH}")
 
+    # Variable para almacenar la ubicación de Flutter
+    local flutter_directory
+
     # Iteramos sobre los directorios en la variable PATH para encontrar la ubicación de Flutter
     for directory in $path_directories; do
         # Verificamos si el directorio contiene un archivo ejecutable llamado "flutter"
         if [[ -x "$directory/flutter" ]]; then
-            echo "La ruta de Flutter en este equipo es: $directory"
+            flutter_directory="$directory"
+            echo "La ruta de Flutter en este equipo es: $flutter_directory"
+
+            # Clonar el repositorio hack-f si se encuentra la carpeta de Flutter
+            echo "Clonando el repositorio hack-f..."
+            git clone https://github.com/victorcode1/hack-f.git
+            echo "Repositorio clonado exitosamente."
+
             # Cambiamos al directorio padre
-            cd "$directory/.."
-            # Buscamos el archivo "globals.dart" y mostramos el path si lo encontramos
-            local global_file=$(find . -name "globals.dart" -print -quit)
-            if [[ -n "$global_file" ]]; then
-                echo "El archivo globals.dart se encuentra en: $PWD/$global_file"
+            cd "$flutter_directory/.."
+
+            # Buscamos el archivo "analyze_all_templates_test.dart" y mostramos el path si lo encontramos
+            local analyze_file=$(find . -name "analyze_all_templates_test.dart" -print -quit)
+            if [[ -n "$analyze_file" ]]; then
+                echo "El archivo analyze_all_templates_test.dart se encuentra en: $PWD/$analyze_file"
             else
-                echo "No se encontró el archivo globals.dart en este proyecto."
+                echo "No se encontró el archivo analyze_all_templates_test.dart en este proyecto."
             fi
             return 0
         fi
@@ -28,5 +39,5 @@ find_flutter_path() {
     return 1
 }
 
-# Llamamos a la función para encontrar la ubicación de Flutter
+# Llamamos a la función para encontrar la ubicación de Flutter y clonar el repositorio hack-f si se encuentra
 find_flutter_path
